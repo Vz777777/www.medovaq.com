@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /medovaq web.zip
+Disallow: /_agents/
+Disallow: /syringe-promo/css/
+
+Sitemap: https://www.medovaq.com/sitemap.xml

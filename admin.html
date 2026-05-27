@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Medovaq B2B Portal</title>
+    <meta name="description" content="Administrative access desk for Medovaq operations.">
+    <meta name="author" content="Medovaq">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Lenis Smooth Scrolling & GSAP -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    
+    <style>
+        /* Admin Specific Aesthetic Extensions */
+        .admin-login-wrapper {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            background-image: 
+                linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)),
+                url('https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&q=80&w=1600');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            padding: 50px 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+
+        .login-card h2 {
+            color: #ffffff;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: none;
+            letter-spacing: -0.02em;
+        }
+
+        .login-card p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 12px;
+            color: #ffffff !important;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 0.15em;
+            transition: all 0.3s ease;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: var(--accent) !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2) !important;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            background-color: var(--accent);
+            color: #ffffff;
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
+        }
+
+        /* Dashboard Core Shell */
+        .admin-main-wrap {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 24px;
+            margin-bottom: 48px;
+        }
+
+        .admin-header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0;
+            text-transform: none;
+            letter-spacing: -0.02em;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        /* Two Column Panel Grid */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .admin-card {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .admin-card h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-transform: none;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+        }
+
+        /* Image Mode Selection Zone */
+        .image-mode-toggle {
+            display: flex;
+            background: rgba(15, 23, 42, 0.04);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--secondary);
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .upload-zone {
+            border: 2px dashed rgba(15, 23, 42, 0.15);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(15, 23, 42, 0.01);
+            position: relative;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        .upload-zone i {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .upload-zone p {
+            font-size: 0.9rem;
+            margin: 0;
+            color: var(--secondary);
+        }
+
+        .file-selected-banner {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #10b981;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* Existing Blogs Table/List */
+        .blogs-admin-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 700px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .blog-row-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .blog-row-card:hover {
+            border-color: rgba(15, 23, 42, 0.12);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .blog-row-thumb {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            object-fit: cover;
+            background-color: #cbd5e1;
+        }
+
+        .blog-row-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .blog-row-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 0 0 4px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--primary);
+        }
+
+        .blog-row-info span {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            display: block;
+        }
+
+        .blog-delete-btn {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            padding: 8px;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .blog-delete-btn:hover {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+        }
+
+        /* Premium Floating Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast-alert {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 16px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+            font-family: var(--font-sans);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transform: translateY(40px);
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        .toast-alert.success {
+            border-left: 4px solid #10b981;
+            color: var(--primary);
+        }
+
+        .toast-alert.error {
+            border-left: 4px solid #ef4444;
+            color: var(--primary);
+        }
+
+        .toast-alert i {
+            font-size: 1.2rem;
+        }
+        
+        .toast-alert.success i { color: #10b981; }
+        .toast-alert.error i { color: #ef4444; }
+
+        /* Loader Overlay for publishing actions */
+        .card-loader {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 20;
+            backdrop-filter: blur(4px);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(37, 99, 235, 0.1);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1024px) {
+            .admin-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .admin-main-wrap { padding: 40px 20px; }
+            .admin-header { flex-direction: column; gap: 16px; align-items: flex-start; }
+            .admin-card { padding: 24px; }
+        }
+    </style>
+</head>
+
+<body style="background-color: var(--bg-color); min-height: 100vh;">
+
+    <!-- TOAST ALERTS ANCHOR -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 1. AUTHENTICATION GATE -->
+    <div class="admin-login-wrapper" id="loginGate">
+        <div class="login-card">
+            <h1 class="nav-logo" style="justify-content: center; color: #ffffff; margin-bottom: 24px;">Medovaq<span class="logo-dot"></span></h1>
+            <h2>Administration Access</h2>
+            <p>Please enter the B2B portal operational key to unlock control desks.</p>
+            <input type="password" class="login-input" placeholder="••••••••" id="passInput">
+            <button class="login-btn" id="loginBtn">Unlock Console <i class="fa-solid fa-lock-open" style="margin-left: 6px;"></i></button>
+        </div>
+    </div>
+
+    <!-- 2. MAIN OPERATION HUB (Hidden until unlocked) -->
+    <div id="dashboardWrapper" style="display: none; padding-top: 100px;">
+        <nav class="scrolled">
+            <div class="nav-container">
+                <a href="/" class="nav-logo">Medovaq<span class="logo-dot"></span></a>
+                <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle Menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <ul class="nav-links" id="nav-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/products">Product Range</a></li>
+                    <li><a href="/blogs" class="active">Blogs</a></li>
+                    <li><a href="/contact">Request a Quote</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="admin-main-wrap">
+            <div class="admin-header">
+                <div>
+                    <h1>Medovaq Control Hub</h1>
+                    <p style="margin: 4px 0 0 0; font-size: 0.95rem;">Manage B2B clinical articles and news dossiers.</p>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Lock Console <i class="fa-solid fa-lock"></i></button>
+            </div>
+
+            <div class="admin-grid">
+                <!-- LEFT COLUMN: WRITE NEW BLOG ARTICLE -->
+                <div class="admin-card" style="position: relative;">
+                    <div class="card-loader" id="formLoader">
+                        <div class="spinner"></div>
+                        <p style="font-family: var(--font-display); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Publishing Article...</p>
+                    </div>
+
+                    <h2><i class="fa-regular fa-pen-to-square" style="color: var(--accent);"></i> Compose B2B Clinical Bulletin</h2>
+                    
+                    <form id="blogForm">
+                        <div class="form-group">
+                            <label class="form-label" for="title">Article Title</label>
+                            <input type="text" id="title" class="form-control" placeholder="e.g. Advanced Autoclave Sterilization Standards" required>
+                        </div>
+
+                        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                            <div>
+                                <label class="form-label" for="date">Display Date</label>
+                                <input type="text" id="date" class="form-control" placeholder="May 26, 2026" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Media Type Selection</label>
+                                <div class="image-mode-toggle">
+                                    <button type="button" class="mode-btn active" id="modeUrlBtn">Paste URL</button>
+                                    <button type="button" class="mode-btn" id="modeFileBtn">Local Upload</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DUAL IMAGE CONTAINER -->
+                        <div class="form-group" id="urlImageGroup">
+                            <label class="form-label" for="imageUrl">Article Banner Image URL</label>
+                            <input type="url" id="imageUrl" class="form-control" placeholder="https://images.unsplash.com/...w=800">
+                        </div>
+
+                        <div class="form-group" id="fileImageGroup" style="display: none;">
+                            <label class="form-label">Upload Local Header Image</label>
+                            <div class="upload-zone" id="dropZone">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <p>Drag & drop surgical image here, or <strong>browse files</strong></p>
+                                <input type="file" id="imageFile" accept="image/*" style="display: none;">
+                                <div class="file-selected-banner" id="fileBanner">
+                                    <i class="fa-regular fa-circle-check"></i> <span id="fileName">image.jpg selected</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="description">Short Description / Card Snippet</label>
+                            <textarea id="description" class="form-control" rows="2" placeholder="Brief 2-sentence summary displaying on the catalog card index..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="content">Article Full Body Content (HTML / Text)</label>
+                            <textarea id="content" class="form-control" rows="12" placeholder="Write full bulletin here. You can use standard HTML formatting tags (e.g. <p>, <h2>, <ul>, <li>, <strong>) to outline the sections..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; border-radius: 12px; padding: 18px;">
+                            <span class="btn-content-wrap">
+                                <i class="fa-solid fa-paper-plane" style="margin-right: 8px;"></i> Publish Live Dossier
+                            </span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- RIGHT COLUMN: CURRENT BLOG INVENTORY -->
+                <div class="admin-card" style="position: relative;">
+                    <div class="card-loader" id="listLoader">
+                        <div class="spinner"></div>
+                        <p style="font-family: var(--font-display); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Refreshing Database...</p>
+                    </div>
+
+                    <h2><i class="fa-solid fa-folder-open" style="color: var(--accent);"></i> Operational Database</h2>
+                    
+                    <div class="blogs-admin-list" id="blogsAdminList">
+                        <!-- Loaded Dynamically via API -->
+                </div>
+
+                <!-- SUBMISSIONS DOWNLOAD ZONE -->
+                <div class="admin-card" style="margin-top: 30px;">
+                    <h2><i class="fa-solid fa-file-csv" style="color: #10b981;"></i> RFQ Submissions Sheet</h2>
+                    <p style="font-size: 0.95rem; color: var(--secondary); margin-bottom: 24px;">Download all Request for Quote (RFQ) client data in a universal CSV/Excel sheet.</p>
+                    <button id="downloadCsvBtn" class="btn btn-secondary" style="width: 100%; border: 2px solid #10b981; color: #10b981; background: transparent; font-weight: 700; font-family: var(--font-display); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.1em; padding: 16px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease;">
+                        <i class="fa-solid fa-file-excel"></i> Download CSV Spreadsheet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIC SYSTEM SCRIPT -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Configuration & Auth Key Checks
+            const loginGate = document.getElementById('loginGate');
+            const dashboardWrapper = document.getElementById('dashboardWrapper');
+            const passInput = document.getElementById('passInput');
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            // Composition form inputs
+            const blogForm = document.getElementById('blogForm');
+            const titleInput = document.getElementById('title');
+            const dateInput = document.getElementById('date');
+            const descInput = document.getElementById('description');
+            const contentInput = document.getElementById('content');
+            const urlImageInput = document.getElementById('imageUrl');
+            const fileImageInput = document.getElementById('imageFile');
+            
+            // Image toggle elements
+            const modeUrlBtn = document.getElementById('modeUrlBtn');
+            const modeFileBtn = document.getElementById('modeFileBtn');
+            const urlImageGroup = document.getElementById('urlImageGroup');
+            const fileImageGroup = document.getElementById('fileImageGroup');
+            const dropZone = document.getElementById('dropZone');
+            const fileBanner = document.getElementById('fileBanner');
+            const fileNameSpan = document.getElementById('fileName');
+
+            // Loader elements
+            const formLoader = document.getElementById('formLoader');
+            const listLoader = document.getElementById('listLoader');
+            const blogsAdminList = document.getElementById('blogsAdminList');
+            
+            let currentImageMode = 'url'; // 'url' or 'file'
+            let selectedFile = null;
+
+            // Prefill date input with today's standard representation
+            const today = new Date();
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            dateInput.value = `${months[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
+
+            // Check if user has an existing operational token
+            const sessionToken = localStorage.getItem('medovaq_admin_token');
+            if (sessionToken) {
+                loginGate.style.display = 'none';
+                dashboardWrapper.style.display = 'block';
+                loadBlogsInventory();
+            }
+
+            // ==========================================
+            // Security Login Interface
+            // ==========================================
+            async function performLogin() {
+                const password = passInput.value;
+                if (!password) {
+                    showToast("Please enter an administrative password.", "error");
+                    return;
+                }
+
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = 'Verifying Authenticity <i class="fa-solid fa-spinner fa-spin" style="margin-left: 6px;"></i>';
+
+                try {
+                    const response = await fetch('/api/admin/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        localStorage.setItem('medovaq_admin_token', result.token);
+                        showToast("Console unlocked successfully.", "success");
+                        
+                        // Sleek transition from Login to Dashboard
+                        gsap.to(loginGate, {
+                            opacity: 0,
+                            y: -40,
+                            duration: 0.6,
+                            ease: 'power3.inOut',
+                            onComplete: () => {
+                                loginGate.style.display = 'none';
+                                dashboardWrapper.style.display = 'block';
+                                loadBlogsInventory();
+                            }
+                        });
+                    } else {
+                        showToast(result.message || "Invalid operational password.", "error");
+                        passInput.value = '';
+                        passInput.focus();
+                    }
+                } catch (err) {
+                    console.error("Login critical failure:", err);
+                    showToast("API handshake error. Is the server online?", "error");
+                } finally {
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Unlock Console <i class="fa-solid fa-lock-open" style="margin-left: 6px;"></i>';
+                }
+            }
+
+            loginBtn.addEventListener('click', performLogin);
+            passInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') performLogin(); });
+
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('medovaq_admin_token');
+                showToast("Console locked.", "success");
+                setTimeout(() => window.location.reload(), 800);
+            });
+
+            // ==========================================
+            // Compose File/URL Toggles
+            // ==========================================
+            modeUrlBtn.addEventListener('click', () => {
+                currentImageMode = 'url';
+                modeUrlBtn.classList.add('active');
+                modeFileBtn.classList.remove('active');
+                urlImageGroup.style.display = 'block';
+                fileImageGroup.style.display = 'none';
+                urlImageInput.required = true;
+                fileImageInput.required = false;
+            });
+
+            modeFileBtn.addEventListener('click', () => {
+                currentImageMode = 'file';
+                modeFileBtn.classList.add('active');
+                modeUrlBtn.classList.remove('active');
+                fileImageGroup.style.display = 'block';
+                urlImageGroup.style.display = 'none';
+                urlImageInput.required = false;
+                fileImageInput.required = !selectedFile; // Only required if no file selected yet
+            });
+
+            // Upload Drag-and-Drop Trigger Configuration
+            dropZone.addEventListener('click', () => fileImageInput.click());
+            
+            fileImageInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleSelectedFile(e.target.files[0]);
+                }
+            });
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    handleSelectedFile(e.dataTransfer.files[0]);
+                }
+            });
+
+            function handleSelectedFile(file) {
+                if (!file.type.startsWith('image/')) {
+                    showToast("Only surgical or product images are allowed.", "error");
+                    return;
+                }
+                selectedFile = file;
+                fileNameSpan.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                fileBanner.style.display = 'flex';
+                fileImageInput.required = false;
+            }
+
+            // ==========================================
+            // Read Dynamic Blogs Inventory
+            // ==========================================
+            async function loadBlogsInventory() {
+                listLoader.style.display = 'flex';
+                try {
+                    const response = await fetch('/api/blogs');
+                    if (!response.ok) throw new Error('API failed to respond');
+                    const blogs = await response.json();
+                    
+                    blogsAdminList.innerHTML = '';
+                    
+                    if (blogs.length === 0) {
+                        blogsAdminList.innerHTML = '<p style="text-align: center; color: var(--secondary); padding: 40px 0;">No active bulletins inside local database.</p>';
+                        return;
+                    }
+
+                    blogs.forEach(blog => {
+                        const row = document.createElement('div');
+                        row.className = 'blog-row-card';
+                        row.innerHTML = `
+                            <img src="${blog.image}" class="blog-row-thumb" alt="${blog.title}" onerror="this.src='/images/placeholder.jpg'">
+                            <div class="blog-row-info">
+                                <h4>${blog.title}</h4>
+                                <span><i class="fa-regular fa-calendar"></i> ${blog.date} | ID: ${blog.id}</span>
+                            </div>
+                            <button class="blog-delete-btn" data-id="${blog.id}" title="Delete Live Post">
+                                <i class="fa-regular fa-trash-can"></i>
+                            </button>
+                        `;
+
+                        // Hook Delete trigger
+                        row.querySelector('.blog-delete-btn').addEventListener('click', async function() {
+                            const blogId = this.getAttribute('data-id');
+                            if (confirm(`Are you sure you want to permanently delete dynamic article ${blogId}? This cannot be undone.`)) {
+                                await deleteBlog(blogId);
+                            }
+                        });
+
+                        blogsAdminList.appendChild(row);
+                    });
+                } catch (err) {
+                    console.error("Error loading index catalog:", err);
+                    showToast("Database loading failure.", "error");
+                } finally {
+                    listLoader.style.display = 'none';
+                }
+            }
+
+            // ==========================================
+            // Delete Dynamic Post
+            // ==========================================
+            async function deleteBlog(id) {
+                listLoader.style.display = 'flex';
+                const token = localStorage.getItem('medovaq_admin_token');
+
+                try {
+                    const response = await fetch(`/api/blogs/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        showToast("Article deleted successfully.", "success");
+                        loadBlogsInventory();
+                    } else {
+                        showToast(result.error || "Deletions refused by backend server.", "error");
+                    }
+                } catch (err) {
+                    console.error("Deletions failure:", err);
+                    showToast(" Handshake failure during deletion.", "error");
+                } finally {
+                    listLoader.style.display = 'none';
+                }
+            }
+
+            // ==========================================
+            // Submit Composition Form (Publishing)
+            // ==========================================
+            blogForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                formLoader.style.display = 'flex';
+                
+                const token = localStorage.getItem('medovaq_admin_token');
+                const formData = new FormData();
+                
+                formData.append('title', titleInput.value);
+                formData.append('date', dateInput.value);
+                formData.append('description', descInput.value);
+                formData.append('content', contentInput.value);
+                formData.append('imageMode', currentImageMode);
+
+                if (currentImageMode === 'url') {
+                    formData.append('imageUrl', urlImageInput.value);
+                } else {
+                    if (!selectedFile) {
+                        showToast("Please drag a local image file or select one.", "error");
+                        formLoader.style.display = 'none';
+                        return;
+                    }
+                    formData.append('blogImage', selectedFile);
+                }
+
+                try {
+                    const response = await fetch('/api/blogs', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formData
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showToast("Clinical bulletin published live!", "success");
+                        
+                        // Clear Form Inputs & reset file selected banners
+                        blogForm.reset();
+                        selectedFile = null;
+                        fileBanner.style.display = 'none';
+                        
+                        // Keep Date prefilled with todays value
+                        dateInput.value = `${months[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
+                        
+                        // Refresh listings
+                        loadBlogsInventory();
+                    } else {
+                        showToast(result.error || "Publishing refused by system controller.", "error");
+                    }
+                } catch (err) {
+                    console.error("Publishing operations failures:", err);
+                    showToast("Handshake network error. Is payload too large?", "error");
+                } finally {
+                    formLoader.style.display = 'none';
+                }
+            });
+
+            // ==========================================
+            // Download RFQ CSV Spreadsheet
+            // ==========================================
+            const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+            if (downloadCsvBtn) {
+                // Style button hover in JS or CSS
+                downloadCsvBtn.addEventListener('mouseenter', () => {
+                    downloadCsvBtn.style.backgroundColor = '#10b981';
+                    downloadCsvBtn.style.color = '#ffffff';
+                });
+                downloadCsvBtn.addEventListener('mouseleave', () => {
+                    downloadCsvBtn.style.backgroundColor = 'transparent';
+                    downloadCsvBtn.style.color = '#10b981';
+                });
+
+                downloadCsvBtn.addEventListener('click', async () => {
+                    const token = localStorage.getItem('medovaq_admin_token');
+                    if (!token) {
+                        showToast("Session expired. Please re-authenticate.", "error");
+                        return;
+                    }
+
+                    downloadCsvBtn.disabled = true;
+                    downloadCsvBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating Sheet...';
+
+                    try {
+                        const response = await fetch('/api/admin/submissions/download', {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+
+                        if (!response.ok) {
+                            if (response.status === 401) {
+                                throw new Error('Unauthorized operational access.');
+                            } else {
+                                throw new Error('No submissions sheet found or server error.');
+                            }
+                        }
+
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'medovaq_submissions_sheet.csv';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                        
+                        showToast("Spreadsheet downloaded successfully.", "success");
+                    } catch (err) {
+                        console.error("Download error:", err);
+                        showToast(err.message || "Failed to download submissions sheet.", "error");
+                    } finally {
+                        downloadCsvBtn.disabled = false;
+                        downloadCsvBtn.innerHTML = '<i class="fa-solid fa-file-excel"></i> Download CSV Spreadsheet';
+                    }
+                });
+            }
+
+            // ==========================================
+            // Floating Notification Toast Dispatcher
+            // ==========================================
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast-alert ${type}`;
+                
+                const icon = type === 'success' ? 'fa-regular fa-circle-check' : 'fa-solid fa-circle-exclamation';
+                toast.innerHTML = `<i class="${icon}"></i> <span>${message}</span>`;
+                
+                document.getElementById('toastContainer').appendChild(toast);
+
+                // Entrance GSAP Animation
+                gsap.to(toast, {
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.4,
+                    ease: 'back.out(1.7)'
+                });
+
+                // Exit & Remove GSAP Animation
+                setTimeout(() => {
+                    gsap.to(toast, {
+                        y: -30,
+                        opacity: 0,
+                        duration: 0.4,
+                        ease: 'power2.in',
+                        onComplete: () => toast.remove()
+                    });
+                }, 3500);
+            }
+        });
+    </script>
+</body>
+
+</html>

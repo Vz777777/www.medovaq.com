@@ -1,0 +1,21 @@
+# Dependency Directories
+node_modules/
+
+# Local/Sensitive Configuration Files
+.env
+
+# Dynamic B2B Data & Database Sheets
+# Excluded to prevent committing test inquiries or private production sales leads to public repositories.
+# The server will automatically initialize empty data tables if they are not present.
+data/submissions.json
+data/submissions.csv
+data/newsletter.json
+
+# Keep logs clean
+logs/
+*.log
+npm-debug.log*
+
+# OS-Specific system files
+.DS_Store
+Thumbs.db
